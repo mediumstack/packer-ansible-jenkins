@@ -18,7 +18,7 @@ node {
     try {
 
       // First stage, pull the docker image
-      stage ('pull latest light packer image') {
+      stage ('Pull packer image') {
         ansiColor('xterm') {
           sh 'docker pull hashicorp/packer:light'
         }
@@ -54,7 +54,7 @@ node {
     try {
 
       // First stage, pull the docker image
-      stage ('pull latest light packer image') {
+      stage ('Pull packer image') {
         ansiColor('xterm') {
           sh 'docker pull hashicorp/packer:light'
         }
@@ -100,16 +100,17 @@ node {
         SNAP_ID = sh(returnStdout: true, script: """aws ec2 describe-images --filter Name=tag:packer_run_uuid,Values=${PACKER_RUN_UUID} | jq ".Images[0].ImageId,.Images[0].BlockDeviceMappings[0].Ebs.SnapshotId" | sed -n '2 p' | sed 's/"//g'""").trim()
   
         // Create a new file to be stored as an artifact with the relevant data
-        sh 'echo ami: ${AMI_ID} > packer-artifact-${PACKER_RUN_UUID}.txt'
-        sh 'echo region: ${AMI_REGION} >> packer-artifact-${PACKER_RUN_UUID}.txt'
-        sh 'echo packer_run_uuid: ${PACKER_RUN_UUID} >> packer-artifact-${PACKER_RUN_UUID}.txt'
-        sh 'echo snapshot-id: ${SNAP_ID} >> packer-artifact-${PACKER_RUN_UUID}.txt'
+        sh 'echo ami: ${AMI_ID} > AMI_ID.afct'
+        sh 'echo region: ${AMI_REGION} > REGION.afct'
+        sh 'echo snapshot-id: ${SNAP_ID} >> SNAPSHOT_ID.afct'
       }
   
       stage ("Archive build output") {
         // Archive the build output artifacts.
         archiveArtifacts artifacts: 'manifest.json'
-        archiveArtifacts artifacts: 'packer-artifact-${PACKER_RUN_UUID}.txt'
+        archiveArtifacts artifacts: 'AMI_ID.afct'
+        archiveArtifacts artifacts: 'REGION.afct'
+        archiveArtifacts artifacts: 'SNAPSHOT_ID.afct'
       }
   
       // Clean the workspace
