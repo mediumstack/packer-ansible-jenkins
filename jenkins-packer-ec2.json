@@ -1,0 +1,48 @@
+{
+  "variables": {
+    "aws_access_key": "",
+    "aws_secret_key": "",
+    "aws_region": "ap-southeast-2",
+    "aws_ami_image": "ami-0d13c26f",
+    "aws_instance_type": "t2.micro"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "{{user `aws_region`}}",
+      "source_ami": "{{user `aws_ami_image`}}",
+      "instance_type": "{{user `aws_instance_type`}}",
+      "ssh_username": "centos",
+      "ami_name": "jenkins-centos-{{isotime \"2006-01-02\"}}",
+      "tags": {
+        "Name": "jenkins-centos-{{isotime \"2006-01-02\"}}",
+        "OS_Version": "CentOS 7",
+        "Release": "7",
+        "Description": "CentOS jenkins LTS with docker installed",
+	"packer": "true",
+	"packer_run_uuid": "{{`packer_run_uuid`}}"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+	  "sudo yum install git epel-release -y",
+          "sudo yum install ansible -y",
+	  "sudo git clone https://github.com/maxstack/ansible-playbook-jenkins.git /tmp/ansible-playbook-jenkins",
+	  "sudo ansible-galaxy install -r /tmp/ansible-playbook-jenkins/requirements.yaml",
+	  "sudo ansible-playbook -i 'localhost,' -c local /tmp/ansible-playbook-jenkins/jenkins-playbook.yaml"
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "manifest",
+      "output": "manifest.json",
+      "strip_path": true
+    }
+  ]
+}
