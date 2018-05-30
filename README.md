@@ -23,3 +23,8 @@ Next validate your file then build!
 packer validate jenkins-packer-ec2.json
 packer build jenkins-packer-ec2.json
 ```
+
+To add the build job to jenkins you can use the following command
+```
+cat _jenkins/packer-ansible-jenkins-pipeline.xml | java -jar /opt/jenkins-cli.jar -s http://admin:somecomplexpassword@localhost:8080 create-job jenkins-packer-pipeline
+```
