@@ -16,9 +16,9 @@
       "source_ami": "{{user `aws_ami_image`}}",
       "instance_type": "{{user `aws_instance_type`}}",
       "ssh_username": "centos",
-      "ami_name": "jenkins-centos-{{ isotime | clean_ami_name }}.{{ user `magic_reference_date` | clean_ami_name }}",
+      "ami_name": "jenkins-centos-{{ isotime | clean_ami_name }}",
       "tags": {
-        "Name": "jenkins-centos-{{ isotime | clean_ami_name }}.{{ user `magic_reference_date` | clean_ami_name }}",
+        "Name": "jenkins-centos-{{ isotime | clean_ami_name }}",
         "OS_Version": "CentOS 7",
         "Release": "7",
         "Description": "CentOS jenkins LTS with docker installed",
