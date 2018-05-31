@@ -88,7 +88,7 @@ node {
       stage ('Gather artifacts') {
   
         // Get the AMI ID
-        AMI_ID = sh(returnStdout: true, script: """grep artifact_id manifest.json  | awk '{print \$2}' |  sed 's/"//g' | sed 's/,//g' |cut -d':' -f2""").trim()
+        AMI = sh(returnStdout: true, script: """grep artifact_id manifest.json  | awk '{print \$2}' |  sed 's/"//g' | sed 's/,//g' |cut -d':' -f2""").trim()
   
         // Get the AMI region
         AMI_REGION = sh(returnStdout: true, script: """grep artifact_id manifest.json  | awk '{print \$2}' |  sed 's/"//g' | sed 's/,//g' |cut -d':' -f1""").trim()
@@ -97,20 +97,21 @@ node {
         PACKER_RUN_UUID = sh(returnStdout: true, script: """grep packer_run_uuid manifest.json  | awk '{print \$2}' |  sed 's/"//g' | sed 's/,//g'""").trim()
   
         // Get the snapshot-id
-        SNAP_ID = sh(returnStdout: true, script: """aws ec2 describe-images --filter Name=tag:packer_run_uuid,Values=${PACKER_RUN_UUID} | jq ".Images[0].ImageId,.Images[0].BlockDeviceMappings[0].Ebs.SnapshotId" | sed -n '2 p' | sed 's/"//g'""").trim()
+        SNAP_ID = sh(returnStdout: true, script: """aws ec2 describe-images --image-ids ${AMI} --query 'Images[*].BlockDeviceMappings[*].Ebs.SnapshotId' --region ${env.REGION} --output text""").trim()
+//        SNAP_ID = sh(returnStdout: true, script: """aws ec2 describe-images --filter Name=tag:packer_run_uuid,Values=${PACKER_RUN_UUID} | jq ".Images[0].ImageId,.Images[0].BlockDeviceMappings[0].Ebs.SnapshotId" | sed -n '2 p' | sed 's/"//g'""").trim()
   
         // Create a new file to be stored as an artifact with the relevant data
-        sh "echo ami: ${AMI_ID} > AMI_ID.afct"
-        sh "echo region: ${AMI_REGION} > REGION.afct"
-        sh "echo snapshot-id: ${SNAP_ID} >> SNAPSHOT_ID.afct"
+        sh "echo ${AMI} > AMI.artifact"
+        sh "echo ${AMI_REGION} > REGION.artifact"
+        sh "echo ${SNAP_ID} >> SNAPSHOT-ID.artifact"
       }
   
       stage ("Archive build output") {
         // Archive the build output artifacts.
         archiveArtifacts artifacts: 'manifest.json'
-        archiveArtifacts artifacts: 'AMI_ID.afct'
+        archiveArtifacts artifacts: 'AMI.afct'
         archiveArtifacts artifacts: 'REGION.afct'
-        archiveArtifacts artifacts: 'SNAPSHOT_ID.afct'
+        archiveArtifacts artifacts: 'SNAPSHOT-ID.afct'
       }
   
       // Clean the workspace
