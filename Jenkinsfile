@@ -20,7 +20,7 @@ node {
 
     try {
 
-      if (AWS_CMD) {
+      if "${AWS_CMD}" {
         stage ('AWS credentials are valid') {
           echo 'Continue build.'
         }
