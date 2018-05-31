@@ -22,8 +22,7 @@
         "OS_Version": "CentOS 7",
         "Release": "7",
         "Description": "CentOS jenkins LTS with docker installed",
-	"packer": "true",
-	"packer_run_uuid": "{{`packer_run_uuid`}}"
+	"packer": "true"
       }
     }
   ],
