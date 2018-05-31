@@ -7,6 +7,9 @@ node {
   // set the docker command to run each stage
   env.PACKER_CMD = "docker run -v $HOME/.aws:/root/.aws:ro  --rm --network host -w /app -v ${WORKSPACE}:/app hashicorp/packer:light"
 
+  // set the aws command to check credentials
+  env.AWS_CMD = "aws ec2 describe-regions"
+
   // checkout the git repo
   stage ('Checkout') {
     checkout scm
@@ -17,7 +20,23 @@ node {
 
     try {
 
-      // First stage, pull the docker image
+      // Check that you have configured your AWS credentials
+      stage ('Check AWS credentials') {
+        sh 'aws ec2 describe-regions'
+      }
+
+      if (${AWS_CMD}) {
+        stage ('AWS credentials are valid') {
+          echo 'Continue build.'
+        }
+      } else {
+        stage ('Abort the build as AWS credentials are invalid') {
+          currentBuild.result = 'ABORTED'
+          error('ABORTING. Please run aws configure as the jenkins user')
+          }
+        }
+
+      // Pull the docker image
       stage ('Pull packer image') {
         ansiColor('xterm') {
           sh 'docker pull hashicorp/packer:light'
@@ -53,7 +72,18 @@ node {
 
     try {
 
-      // First stage, pull the docker image
+      if (${AWS_CMD}) {
+        stage ('AWS credentials are valid') {
+          echo 'Continue build.'
+        }
+      } else {
+        stage ('Abort the build as AWS credentials are invalid') {
+          currentBuild.result = 'ABORTED'
+          error('ABORTING. Please run aws configure as the jenkins user')
+          }
+        }
+
+      // Pull the docker image
       stage ('Pull packer image') {
         ansiColor('xterm') {
           sh 'docker pull hashicorp/packer:light'
