@@ -20,12 +20,7 @@ node {
 
     try {
 
-      // Check that you have configured your AWS credentials
-      stage ('Check AWS credentials') {
-        sh 'aws ec2 describe-regions'
-      }
-
-      if (${AWS_CMD}) {
+      if (AWS_CMD) {
         stage ('AWS credentials are valid') {
           echo 'Continue build.'
         }
