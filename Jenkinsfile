@@ -10,6 +10,10 @@ node {
   // set the aws command to check credentials
   env.AWS_CMD = "aws ec2 describe-regions"
 
+  // set the aws credentials path
+  def exists = fileExists '../../.aws/credentials'
+
+
   // checkout the git repo
   stage ('Checkout') {
     checkout scm
@@ -20,9 +24,9 @@ node {
 
     try {
 
-      if ("${AWS_CMD}") {
+      if (exists) {
         stage ('AWS credentials are valid') {
-          echo 'Continue build.'
+          echo 'Credentials file exists, continue.'
         }
       } else {
         stage ('Abort the build as AWS credentials are invalid') {
@@ -67,9 +71,9 @@ node {
 
     try {
 
-      if (AWS_CMD) {
+      if (exists) {
         stage ('AWS credentials are valid') {
-          echo 'Continue build.'
+          echo 'Credentials file exists, continue.'
         }
       } else {
         stage ('Abort the build as AWS credentials are invalid') {
