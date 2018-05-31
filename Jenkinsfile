@@ -26,7 +26,7 @@ node {
 
       if (exists) {
         stage ('AWS credentials are valid') {
-          echo 'Credentials file exists, continue.'
+          echo 'Credentials file exists'
         }
       } else {
         stage ('Abort the build as AWS credentials are invalid') {
@@ -72,11 +72,11 @@ node {
     try {
 
       if (exists) {
-        stage ('AWS credentials are valid') {
-          echo 'Credentials file exists, continue.'
+        stage ('AWS credentials check') {
+          echo 'Credentials file exists'
         }
       } else {
-        stage ('Abort the build as AWS credentials are invalid') {
+        stage ('AWS credentials check') {
           currentBuild.result = 'ABORTED'
           error('ABORTING. Please run aws configure as the jenkins user')
           }
