@@ -75,7 +75,7 @@ node {
       }
   
       // Wait for approval
-      input 'Deploy stack?'
+      input 'Build packer image?'
   
       // Build the packer config
       stage ('Packer build') {
