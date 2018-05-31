@@ -97,7 +97,7 @@ node {
         PACKER_RUN_UUID = sh(returnStdout: true, script: """grep packer_run_uuid manifest.json  | awk '{print \$2}' |  sed 's/"//g' | sed 's/,//g'""").trim()
   
         // Get the snapshot-id
-        SNAP_ID = sh(returnStdout: true, script: """aws ec2 describe-images --image-ids ${AMI} --query 'Images[*].BlockDeviceMappings[*].Ebs.SnapshotId' --region ${env.REGION} --output text""").trim()
+        SNAP_ID = sh(returnStdout: true, script: """aws ec2 describe-images --image-ids ${AMI} --query 'Images[*].BlockDeviceMappings[*].Ebs.SnapshotId' --region ap-southeast-2 --output text""").trim()
 //        SNAP_ID = sh(returnStdout: true, script: """aws ec2 describe-images --filter Name=tag:packer_run_uuid,Values=${PACKER_RUN_UUID} | jq ".Images[0].ImageId,.Images[0].BlockDeviceMappings[0].Ebs.SnapshotId" | sed -n '2 p' | sed 's/"//g'""").trim()
   
         // Create a new file to be stored as an artifact with the relevant data
