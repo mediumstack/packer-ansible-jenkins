@@ -53,9 +53,6 @@ node {
 
     try {
 
-      // Clean workspace before first run
-      cleanWs()
-
       // First stage, pull the docker image
       stage ('Pull packer image') {
         ansiColor('xterm') {
