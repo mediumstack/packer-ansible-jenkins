@@ -92,10 +92,14 @@ node {
   
         // Get the AMI region
         AMI_REGION = sh(returnStdout: true, script: """grep artifact_id manifest.json  | awk '{print \$2}' |  sed 's/"//g' | sed 's/,//g' |cut -d':' -f1""").trim()
-  
+
+        // Describe newly created image
+        AMI_DETAIL = sh(returnStdout: true, script: """aws ec2 describe-images --image-ids ${AMI}""").trim()  
+
         // Create a new file to be stored as an artifact with the relevant data
         sh "echo ${AMI} > AMI.artifact"
         sh "echo ${AMI_REGION} > REGION.artifact"
+        sh "echo ${AMI_DETAIL} > AMI_DETAIL.artifact"
       }
   
       stage ("Archive build output") {
